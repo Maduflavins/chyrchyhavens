@@ -1,13 +1,25 @@
 <% include partials/header %>
-<h1><%=church.name%></h1>
+<%church.forEach(function(church){%>
+    <h1><%=church.name%></h1>
 
-<img src="<%=church.image%>">
+    <img src="<%=church.image%>">
 
-<p><%=church.founder%></p>
-<p><%-church.date%></p>
-<p><%=church.GOS%></p>
-<p><%=church.netWorth%></p>
-<p><%=church.population%></p>
+    <p><%=church.founder%></p>
+    <p><%-church.date%></p>
+    <p><%=church.GOS%></p>
+    <p><%=church.netWorth%></p>
+    <p><%=church.population%></p>
+
+<%})%>
+
+
+
+<%church.comments.forEach(function(comment){%>
+          <p>
+              <strong><%=comment.author%></strong> - <%=comment.text%>
+          </p>
+
+<%})%>
 
 
 <% include partials/footer %>

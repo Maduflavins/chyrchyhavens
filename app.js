@@ -1,45 +1,20 @@
 var express = require('express'),
 app         = express(),
 mongoose    = require('mongoose'),
+Church      = require("./models/church")
 Schema      = mongoose.Schema,
+seedDB       = require("./seeds");
 bodyParser  = require('body-parser');
 
 
 mongoose.connect("mongodb://localhost/churchy");
 
 
-//Schema Setup
-var churchSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    founder: String,
-    date: String,
-    GOS: String,
-    netWorth: String,
-    population: String
-});
+seedDB();
 
-var Church = mongoose.model("Church", churchSchema);
 
-// Church.create(
-//     {
-//        name:"church of today", 
-//        image:"https://www.baragacounty.org/wp-content/uploads/2012/06/Bethany-Lutheran.jpg",
-       
-//        founder: "FOUNDER: harrison ford",
-//        date: "Date: founded in 1949",
-//        GOS:   "GOS: MacMilian",
-//        netWorth: "NETWORTH: 2 billion dollars",
-//        population: "Population: 3 thousand"
-      
-//     }, function(err, newChurch){
-//         if(err){
-//             console.log(err)
-//         }else{
-//             console.log("new church added");
-//             console.log(newChurch);
-//         }
-//     })
+
+
 
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -50,12 +25,7 @@ app.get("/", function(req, res){
     res.render("landing");
 })
 
-// var churches = [
-//         {name:"church of saints", image:"https://www.baragacounty.org/wp-content/uploads/2012/06/Apostolic-Lutheran.jpg"},
-//         {name:"church of today", image:"https://www.baragacounty.org/wp-content/uploads/2012/06/Bethany-Lutheran.jpg"},
-//         {name:"redemers place", image:"https://www.baragacounty.org/wp-content/uploads/2012/06/Pelkie-Laestadian-Church.jpg"},
-//         {name:"later day saints", image:"https://www.baragacounty.org/wp-content/uploads/2012/06/Pelkie-Laestadian-Church.jpg"}
-//     ];
+
 
 //INDEX ROUTE-SHOW ALL CHURCHES
 app.get("/churches", function(req, res){
@@ -112,10 +82,11 @@ app.get("/churches/new", function(req, res){
 
 app.get("/churches/:id/", function(req, res){
     //Find Campround with the provided ID
-    Church.findById(req.params.id, function(err, foundChurch){
+    Church.findById(req.params.id).populate("comments").exec(function(err, foundChurch){
         if(err){
             console.log(err);
         }else{
+            console.log(foundChurch);
             //Rener the show template for that church
             res.render("show", {church: foundChurch});
 
