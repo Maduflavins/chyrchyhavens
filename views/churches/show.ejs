@@ -1,5 +1,5 @@
-<% include partials/header %>
-<%church.forEach(function(church){%>
+<% include ../partials/header %>
+
     <h1><%=church.name%></h1>
 
     <img src="<%=church.image%>">
@@ -10,7 +10,9 @@
     <p><%=church.netWorth%></p>
     <p><%=church.population%></p>
 
-<%})%>
+    <p><a class="btn btn-success" href="/churches/<%=church._id%>/comments/new">Add new Comment</a></p>
+
+
 
 
 
@@ -22,4 +24,4 @@
 <%})%>
 
 
-<% include partials/footer %>
+<% include ../partials/footer %>

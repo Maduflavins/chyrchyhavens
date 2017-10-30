@@ -2,6 +2,7 @@ var express = require('express'),
 app         = express(),
 mongoose    = require('mongoose'),
 Church      = require("./models/church")
+Comment     = require("./models/comment"),
 Schema      = mongoose.Schema,
 seedDB       = require("./seeds");
 bodyParser  = require('body-parser');
@@ -9,17 +10,15 @@ bodyParser  = require('body-parser');
 
 mongoose.connect("mongodb://localhost/churchy");
 
+app.use(bodyParser.urlencoded({extended:true}));
+
+app.set("view engine", "ejs");
 
 seedDB();
 
 
 
 
-
-
-app.use(bodyParser.urlencoded({extended:true}));
-
-app.set("view engine", "ejs");
 
 app.get("/", function(req, res){
     res.render("landing");
@@ -35,7 +34,7 @@ app.get("/churches", function(req, res){
         if(err){
             console.log(err)
         }else{
-            res.render("index", {churches: allChurches});
+            res.render("churches/index", {churches: allChurches});
 
         }
     })
@@ -74,8 +73,8 @@ app.post("/churches", function(req, res){
 
 //NEW- SHOW TO CREATE NEW CHURCHE
 
-app.get("/churches/new", function(req, res){
-    res.render("new.ejs");
+app.get("churches/new", function(req, res){
+    res.render("/churches/new");
 })
 
 //SHOW ROUTE MORE INFO ABOUT A CHURCH
@@ -88,10 +87,55 @@ app.get("/churches/:id/", function(req, res){
         }else{
             console.log(foundChurch);
             //Rener the show template for that church
-            res.render("show", {church: foundChurch});
+            res.render("churches/show", {church: foundChurch});
 
         }
 
+    })
+    
+})
+
+
+//===================================================
+//COMMENT ROUTE
+//====================================================
+
+app.get("/churches/:id/comments/new", function(req, res){
+    //find Church by ID
+    Church.findById(req.params.id, function(err, church){
+        if(err){
+            console.log(err)
+        }else{
+            res.render("comments/new", {church: church});
+        }
+    })
+    
+})
+
+app.post("/churches/:id/comments", function(req, res){
+    //LOOKUP COMMENTS USNG IDS
+    Church.findById(req.params.id, function(err, church){
+        if(err){
+            console.log(err);
+            res.redirect("/churches")
+        }else{
+            //CREATE A COMMENT
+            Comment.create(req.body.comment, function(err, comment){
+                if(err){
+                    console.log(err)
+                }else{
+                    //CONNECT COMMENT TO A CHURCH
+                    church.comments.push(comment);
+                    //save
+                    church.save();
+                    //REDIRECT TO THE CHURCH SHOW PAGE
+                    res.redirect("/churches/" + church._id)
+                }
+            })
+            
+            
+
+        }
     })
     
 })
