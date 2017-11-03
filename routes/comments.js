@@ -1,7 +1,8 @@
 var express = require("express");
-var router = express.Router();
+var router = express.Router({mergeParams: true});
 var Church = require("../models/church");
 var Comment = require("../models/comment");
+var middleware = require("../middleware/index.js");
 
 
 
@@ -9,7 +10,7 @@ var Comment = require("../models/comment");
 //COMMENT NEW
 //====================================================
 
-router.get("/churches/:id/comments/new", isLoggedIn, function(req, res){
+router.get("/churches/:id/comments/new", middleware.isLoggedIn, function(req, res){
     
     Church.findById(req.params.id, function(err, church){
         if(err){
@@ -23,7 +24,7 @@ router.get("/churches/:id/comments/new", isLoggedIn, function(req, res){
 //===================================================================
 // COMMENT CREATE
 //====================================================================
-router.post("/churches/:id/comments",isLoggedIn, function(req, res){
+router.post("/churches/:id/comments", middleware.isLoggedIn, function(req, res){
     //LOOKUP COMMENTS USNG IDS
     Church.findById(req.params.id, function(err, church){
         if(err){
@@ -56,19 +57,42 @@ router.post("/churches/:id/comments",isLoggedIn, function(req, res){
     })
     
 })
-//======================================================================
-//MIDDLEWARE
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        return next()
-    }
-    res.redirect("/login")
-}
 
-//======================================================================
+//EDIT COMMENT ROUTE
+router.get("/churches/:id/comments/:comment_id/edit", middleware.checkCommentOwnerShip, function(req, res){
+    Comment.findById(req.params.comment_id, function(err, foundComment){
+        if(err){
+            res.redirect("back")
+        }else{
+            res.render(comments/edit, {church_id:req.params.id});
+        }
+    })
+   
+})
 
+//UPDATE COMMENT ROUTE
 
+router.put("/churches/:id/comments/:comment_id", middleware.checkCommentOwnerShip, function(req, res){
+    Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
+        if(err){
+            res.redirect("back");
+        }else{
+            res.redirect("/churches/" + req.params.id);
+        }
+    })
+})
 
+//DELETE COMMENT ROUTE
+
+router.delete("/churches/:id/comments/:comment_id", middleware.checkCommentOwnerShip, function(req, res){
+    Comment.findByIdAndRemove(req.params.comment_id, function(err){
+        if(err){
+            res.redirect("back")
+        }else{
+            res.redirect("/church/" + req.params.id)
+        }
+    })
+})
 
 
 module.exports = router;

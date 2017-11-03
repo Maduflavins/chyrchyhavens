@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Church = require("../models/church");
 var Comment = require("../models/comment")
+var middleware = require("../middleware/index.js");
 
 //INDEX ROUTE-SHOW ALL CHURCHES
 router.get("/churches", function(req, res){
@@ -24,7 +25,7 @@ router.get("/churches", function(req, res){
 
 //CREATE ROUTE ADD NEW CHURCHES TO DATABASE
 
-router.post("/churches",isLoggedIn, function(req, res){
+router.post("/churches",middleware.isLoggedIn, function(req, res){
     //get data from form and add to churches array
     var name = req.body.name;
     var image = req.body.image;
@@ -57,7 +58,7 @@ router.post("/churches",isLoggedIn, function(req, res){
 
 //NEW- SHOW TO CREATE NEW CHURCHE
 
-router.get("/churches/new", isLoggedIn, function(req, res){
+router.get("/churches/new", middleware.isLoggedIn, function(req, res){
     res.render("churches/new");
 })
 
@@ -81,19 +82,17 @@ router.get("/churches/:id/", function(req, res){
 })
 
 //EDIT CHURCH 
-router.get("/churches/:id/edit", function(req, res){
-    Church.findById(req.params.id, function(err, foundChurch){
-        if(err){
-            res.redirect("/churches")
-        }else{
-            res.render("churches/edit", {church: foundChurch});
-        }
-    })
-})
+router.get("/churches/:id/edit",middleware.checkChurchOwnership,function(req, res){
+	//is user logged in
+		Church.findById(req.params.id, function(err, foundChurch){
+				res.render("church/edit", {church: foundChurch});
+		});
+
+});
 
 //update church route
 
-router.put("/churches/:id", function(req, res){
+router.put("/churches/:id",middleware.checkChurchOwnership, function(req, res){
     Church.findByIdAndUpdate(req.params.id, req.body.church, function(err, updatedChurch){
         if(err){
             res.redirect("/churches")
@@ -105,7 +104,7 @@ router.put("/churches/:id", function(req, res){
 
 //Destroy Church Route
 
-router.delete("/churches/:id/", function(req, res){
+router.delete("/churches/:id/",middleware.checkChurchOwnership, function(req, res){
     Church.findByIdAndRemove(req.params.id, function(err){
         if(err){
             res.redirect("/churches");
@@ -114,16 +113,6 @@ router.delete("/churches/:id/", function(req, res){
         }
     })
 })
-
-// middle ware
-
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        return next()
-    }
-    res.redirect("/login")
-}
-
 
 
 module.exports = router;
