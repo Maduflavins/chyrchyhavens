@@ -31,7 +31,7 @@ router.post("/register", function(req, res){
 			return res.render("register")
 		}
 		passport.authenticate("local")(req, res, function(){
-			req.flash("success", "welcome to churchy" + user.username);
+			req.flash("success", "welcome to churchy"  +  user.username);
 			res.redirect("/churches");
 		})
 	})

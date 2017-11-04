@@ -24,7 +24,9 @@ indexRoutes      = require("./routes/index");
 
 mongoose.Promise = require('bluebird');
 
-mongoose.connect("mongodb://localhost/churchy");
+// mongoose.connect("mongodb://localhost/churchy");
+mongoose.connect("mongodb://maduabuchi:Maduabuchi123@ds249025.mlab.com:49025/churchy");
+// mongodb://maduabuchi:Maduabuchi123@ds249025.mlab.com:49025/churchy
 
 app.use(bodyParser.urlencoded({extended:true}));
 
