@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"start-runner -f tasks.js"
+    "start":"start-runner -f app.js"
     
   },
   "author": "maduflavins",
