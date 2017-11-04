@@ -5,12 +5,14 @@ Church       = require("./models/church"),
 Comment      = require("./models/comment"),
 User          = require('./models/user'),
 methodOveride = require("method-override"),
+flash         = require("connect-flash");
 Schema       = mongoose.Schema,
 passport      = require("passport"),
 passportLocalMongoose = require('passport-local-mongoose'),
 LocalStrategy = require('passport-local'),
 seedDB      = require("./seeds");
 bodyParser  = require('body-parser');
+
 
 // REQUIRING ROUTES
 
@@ -31,6 +33,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 
 app.use(methodOveride("_method"));
+app.use(flash());
 
 
 
@@ -57,6 +60,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
 	res.locals.currentUser = req.user;
+	res.locals.error= req.flash("error");
+	res.locals.success= req.flash("success");
 	next();
 })
 

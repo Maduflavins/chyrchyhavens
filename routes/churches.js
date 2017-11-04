@@ -28,6 +28,7 @@ router.get("/churches", function(req, res){
 router.post("/churches",middleware.isLoggedIn, function(req, res){
     //get data from form and add to churches array
     var name = req.body.name;
+    var price = req.body.price;
     var image = req.body.image;
     var found = req.body.founder;
     var date =  req.body.date;
@@ -38,7 +39,7 @@ router.post("/churches",middleware.isLoggedIn, function(req, res){
         id: req.user._id,
         username: req.user.username
     };
-    var newChurch = {name: name, image: image, founder: found, date: date, GOS:gos, NetWortht: net, population: pop, author:author}
+    var newChurch = {name: name, price: price, image: image, founder: found, date: date, GOS:gos, NetWortht: net, population: pop, author:author}
     //Create a new Church and add to database
     Church.create(newChurch, function(err, newlyAddedChurch){
         if(err){
@@ -85,6 +86,7 @@ router.get("/churches/:id/", function(req, res){
 router.get("/churches/:id/edit",middleware.checkChurchOwnership,function(req, res){
 	//is user logged in
 		Church.findById(req.params.id, function(err, foundChurch){
+                req.flash("success", "you are about to edit a church")
 				res.render("church/edit", {church: foundChurch});
 		});
 
@@ -95,8 +97,10 @@ router.get("/churches/:id/edit",middleware.checkChurchOwnership,function(req, re
 router.put("/churches/:id",middleware.checkChurchOwnership, function(req, res){
     Church.findByIdAndUpdate(req.params.id, req.body.church, function(err, updatedChurch){
         if(err){
+            req.flash("error", "not able to update")
             res.redirect("/churches")
         }else{
+            req.flash("success", "you have successfully updates a church")
             res.redirect("/churches/" + req.params.id);
         }
     })

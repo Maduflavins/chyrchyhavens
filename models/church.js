@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 //Schema Setup
 var churchSchema = new mongoose.Schema({
     name: String,
+    price: String,
     image: String,
     founder: String,
     date: String,

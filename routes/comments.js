@@ -34,6 +34,7 @@ router.post("/churches/:id/comments", middleware.isLoggedIn, function(req, res){
             //CREATE A COMMENT
             Comment.create(req.body.comment, function(err, comment){
                 if(err){
+                    req.flash("error", "oops something went wrong");
                     console.log(err)
                 }else{
                     //add a user and id to comment
@@ -47,6 +48,7 @@ router.post("/churches/:id/comments", middleware.isLoggedIn, function(req, res){
                     church.save();
                     //REDIRECT TO THE CHURCH SHOW PAGE
                     console.log(comment);
+                    req.flash("error", "thank you for your contribution");
                     res.redirect("/churches/" + church._id)
                 }
             })
